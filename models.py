@@ -1,45 +1,36 @@
-from tensorflow.keras.layers import Input, Conv2D
+from tensorflow.keras.layers import Input, Conv2D, Concatenate
 from tensorflow.keras.models import Model
 
+# HYPER PARAMS
+n_hidden = 6
 
-class PixelEncoder(Model):
-    # maps (Xt, Xt+1) to a latent representation of S0 = (p, q) 
+def _conv(n_filters):
+    x = Conv2D(n_filters, (2,2), 2, padding='same', activation='relu')
+    return x
 
-    def _conv(self, n_filters):
-        x = Conv2D(n_filters, (2,2), 2, padding='same', activation='relu')
-        return x
+def _convblock(input_layer):
+    x = _conv(32)(input_layer)
+    x = _conv(64)(x)
 
-    def _convblock(self):
+    return x
 
-        self.conv1_1 = self._conv(32)
-        self.conv1_2 = self._conv(64)
-        self.conv1_3 = self._conv(64)
-        self.conv1_4 = self._conv(64)
-        self.conv1_5 = self._conv(64)
-        self.conv1_6 = self._conv(64)
-        self.conv1_7 = self._conv(64)
-        self.conv1_8 = self._conv(48)
+def PixelEncoder():
+    # maps ((MxN)t, (MxN)t+1) to (4x4x32) latent representation of (p,q)
 
-        return 
+    input_1 = Input(shape=(32,32, 1))
+    input_2 = Input(shape=(32,32, 1))
 
+    encoder_branch_1 = _convblock(input_1)
+    encoder_branch_2 = _convblock(input_2)
 
-    def __init__(self):
-        super(PixelEncoder, self).__init__()
+    concatenate_1 = Concatenate()([encoder_branch_1, encoder_branch_2])
 
-        self.input1_1 = Input()
-        self.input1_2 = Input()
+    conv_1 = _conv(32)(concatenate_1)
 
+    model = Model(inputs=[input_1, input_2], outputs=conv_1)
 
+    return model
 
-    def call(self, inputs):
+def HamiltionianNN():
 
-        x = self.input1_1:
-        x =
-
-        return x
-
-class HamiltonianNetwork(Model):
-    # Maps latent representation of S0 = (p, q) to scalar R (Hamiltonian of the system)
-
-    def __init__(self):
-        super(HamiltonianNetwork, self).__init__()
+    r
